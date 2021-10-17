@@ -172,16 +172,6 @@ function App() {
     map.current.setFilter(layerId, ['==', ['get', key], value]);
   };
 
-  const filterByPostion = layerId => {
-    var distanceX = 2 / (111.32 * Math.cos((lat * Math.PI) / 180));
-    var distanceY = 2 / 110.574;
-    console.log(distanceY + parseFloat(lat), parseFloat(lat) - distanceY);
-    map.current.setFilter(layerId, ['<=', ['get', 'lat'], parseFloat(lat) + distanceY]);
-    map.current.setFilter(layerId, ['>=', ['get', 'lat'], parseFloat(lat) - distanceY]);
-    // map.current.setFilter(layerId, ['<=', ['get', 'lon'], parseFloat(lng) + distanceX]);
-    // map.current.setFilter(layerId, ['>=', ['get', 'lon'], parseFloat(lng) - distanceX]);
-  };
-
   const measure = point => {
     restAll();
     map.current.addSource('polygon', createGeoJSONCircle(point, 3));
@@ -249,7 +239,6 @@ function App() {
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
       </div>
       <div ref={mapContainer} className="map-container" />
-      <button onClick={measure}>measure</button>
       <Select defaultValue="all" style={{ width: 120 }} onChange={filterByType}>
         <Option value="all">All</Option>
         <Option value="Community Use">Community Use</Option>
