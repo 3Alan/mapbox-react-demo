@@ -1,20 +1,65 @@
 import React, { useRef, useEffect, useState } from 'react';
-import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
+import mapboxgl, { GeolocateControl } from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { Select } from 'antd';
+import Detail from './components/Detail';
 
 mapboxgl.accessToken =
   'pk.eyJ1IjoiYWxhbndhbmczIiwiYSI6ImNrdXV4dDd0ZjFraG8ydXBqZ2J1OWRwcHUifQ.5NvSu2AbiWynx-7B8TSZQw';
 
 const { Option } = Select;
 
+const createGeoJSONCircle = function (center, radiusInKm, points) {
+  if (!points) points = 64;
+
+  var coords = {
+    latitude: center[1],
+    longitude: center[0]
+  };
+
+  var km = radiusInKm;
+
+  var ret = [];
+  var distanceX = km / (111.32 * Math.cos((coords.latitude * Math.PI) / 180));
+  var distanceY = km / 110.574;
+
+  var theta, x, y;
+  for (var i = 0; i < points; i++) {
+    theta = (i / points) * (2 * Math.PI);
+    x = distanceX * Math.cos(theta);
+    y = distanceY * Math.sin(theta);
+
+    ret.push([coords.longitude + x, coords.latitude + y]);
+  }
+  ret.push(ret[0]);
+
+  return {
+    type: 'geojson',
+    data: {
+      type: 'FeatureCollection',
+      features: [
+        {
+          type: 'Feature',
+          geometry: {
+            type: 'Polygon',
+            coordinates: [ret]
+          }
+        }
+      ]
+    }
+  };
+};
+
 function App() {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [lng, setLng] = useState(144.943835);
-  const [lat, setLat] = useState(-37.81656882);
-  const [zoom, setZoom] = useState(13);
+  const mapSearch = useRef(null);
+  const [lng, setLng] = useState(144.9594);
+  const [lat, setLat] = useState(-37.8019);
+  const [zoom, setZoom] = useState(13.5);
+  const [type, setType] = useState('');
+  const [detail, setDetail] = useState({});
 
   useEffect(() => {
     if (map.current) return; // initialize map only once
@@ -24,42 +69,65 @@ function App() {
       center: [lng, lat],
       zoom: zoom
     });
-    console.log(mapboxgl);
+
+    mapSearch.current = new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      mapboxgl: mapboxgl
+    });
+
+    map.current.addControl(mapSearch.current);
 
     map.current.addControl(
-      new MapboxGeocoder({
+      new GeolocateControl({
         accessToken: mapboxgl.accessToken,
         mapboxgl: mapboxgl
       })
     );
   });
 
+  // style effect
   useEffect(() => {
     if (!map.current) return;
     const mapInstance = map.current;
-    // mapInstance.on('mousemove', e => {
-    //   let buildinginfo = mapInstance.queryRenderedFeatures(e.point, {
-    //     layers: ['live']
-    //   });
-
-    //   if (buildinginfo.length > 0) {
-    //     document.querySelector('#info').innerHTML =
-    //       '<p>' +
-    //       buildinginfo[0].properties.Title +
-    //       '</p><p><em>' +
-    //       buildinginfo[0].properties.Date +
-    //       '</em></p>';
-    //   } else {
-    //     document.querySelector('#info').innerHTML =
-    //       '<p>Move your mouse over a point to view details.</p>';
-    //   }
-    // });
 
     mapInstance.on('mouseenter', 'live', e => {
       mapInstance.getCanvas().style.cursor = 'pointer';
+      new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(
+          '<span class="popup-address">' +
+            'Name: ' +
+            e.features[0].properties['venue_name'] +
+            '</span><br>' +
+            ' Type: places of interests'
+        )
+        .addTo(mapInstance);
     });
     mapInstance.on('mouseenter', 'landmarks', e => {
       mapInstance.getCanvas().style.cursor = 'pointer';
+      new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(
+          '<span class="popup-address">' +
+            'Name: ' +
+            e.features[0].properties['Feature Name'] +
+            '</span><br>' +
+            ' Type: places of interests'
+        )
+        .addTo(mapInstance);
+    });
+    mapInstance.on('mouseenter', 'cafe', e => {
+      mapInstance.getCanvas().style.cursor = 'pointer';
+      new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML(
+          '<span class="popup-address">' +
+            'Name: ' +
+            e.features[0].properties['Trading name'] +
+            '</span><br>' +
+            ' Type: café and restaurant'
+        )
+        .addTo(mapInstance);
     });
 
     // Change it back to a pan icon when it leaves.
@@ -69,44 +137,25 @@ function App() {
     mapInstance.on('mouseleave', 'landmarks', e => {
       mapInstance.getCanvas().style.cursor = '';
     });
+    mapInstance.on('mouseleave', 'cafe', e => {
+      mapInstance.getCanvas().style.cursor = '';
+    });
 
     map.current.on('click', 'live', e => {
-      console.log(e.features[0].properties);
-      new mapboxgl.Popup()
-        .setLngLat(e.lngLat)
-        .setHTML(
-          '<span class="popup-address">' +
-            e.features[0].properties.Title +
-            '</span><br>' +
-            ' Location: ' +
-            e.features[0].properties.Location +
-            ' <br>Number of Victims: ' +
-            e.features[0].properties.Total_Number_of_Victims +
-            ' <br>Shooter Name: ' +
-            e.features[0].properties.Shooter_Name +
-            '<br>Shooter Race: ' +
-            e.features[0].properties.Shooter_Race
-        )
-        .addTo(mapInstance);
+      setType('live');
+      setDetail(e.features[0].properties);
     });
     map.current.on('click', 'landmarks', e => {
-      console.log(e.features[0].properties);
-      new mapboxgl.Popup()
-        .setLngLat(e.lngLat)
-        .setHTML(
-          '<span class="popup-address">' +
-            e.features[0].properties.Title +
-            '</span><br>' +
-            ' Location: ' +
-            e.features[0].properties.Location +
-            ' <br>Number of Victims: ' +
-            e.features[0].properties.Total_Number_of_Victims +
-            ' <br>Shooter Name: ' +
-            e.features[0].properties.Shooter_Name +
-            '<br>Shooter Race: ' +
-            e.features[0].properties.Shooter_Race
-        )
-        .addTo(mapInstance);
+      setType('landmarks');
+      setDetail(e.features[0].properties);
+    });
+    map.current.on('click', 'cafe', e => {
+      setType('cafe');
+      setDetail(e.features[0].properties);
+    });
+
+    mapSearch.current.on('result', ({ result }) => {
+      measure(result.center);
     });
   }, []);
 
@@ -120,34 +169,78 @@ function App() {
   });
 
   const onFilter = (layerId, key, value) => {
-    // const a = map.current.getLayoutProperty('landmarks', 'visibility');
     map.current.setFilter(layerId, ['==', ['get', key], value]);
-    // map.current.setFilter('landmarks', ['==', ['get', 'Theme'], 'Transport']);
-    // map.current.setFilter('landmarks', null);
-    // map.current.getFilter('landmarks');
-    // const visibility = map.current.getLayoutProperty('landmarks', 'visibility');
-    // map.current.setLayoutProperty(
-    //   'landmarks',
-    //   'visibility',
-    //   visibility === 'visible' ? 'none' : 'visible'
-    // );
-    console.log(map.current.getFilter('landmarks'));
   };
 
-  const measure = () => {
-    var distanceX = 1 / (111.32 * Math.cos((lat * Math.PI) / 180));
-    var distanceY = 1 / 110.574;
-    console.log(distanceY, distanceY + parseFloat(lat), parseFloat(lat) - distanceY);
-    map.current.setFilter('landmarks', ['<=', ['get', 'lat'], distanceY + parseFloat(lat)]);
-    map.current.setFilter('landmarks', ['>=', ['get', 'lat'], parseFloat(lat) - distanceY]);
+  const filterByPostion = layerId => {
+    var distanceX = 2 / (111.32 * Math.cos((lat * Math.PI) / 180));
+    var distanceY = 2 / 110.574;
+    console.log(distanceY + parseFloat(lat), parseFloat(lat) - distanceY);
+    map.current.setFilter(layerId, ['<=', ['get', 'lat'], parseFloat(lat) + distanceY]);
+    map.current.setFilter(layerId, ['>=', ['get', 'lat'], parseFloat(lat) - distanceY]);
+    // map.current.setFilter(layerId, ['<=', ['get', 'lon'], parseFloat(lng) + distanceX]);
+    // map.current.setFilter(layerId, ['>=', ['get', 'lon'], parseFloat(lng) - distanceX]);
   };
 
-  const filterByTheme = value => {
-    onFilter('landmarks', 'Theme', value);
+  const measure = point => {
+    restAll();
+    map.current.addSource('polygon', createGeoJSONCircle(point, 3));
+
+    map.current.addLayer({
+      id: 'polygon',
+      type: 'fill',
+      source: 'polygon',
+      layout: {},
+      paint: {
+        'fill-color': '#93C5FD',
+        'fill-opacity': 0.4
+      }
+    });
+  };
+
+  const resetVisible = value => {
+    map.current.setLayoutProperty('live', 'visibility', value);
+    map.current.setLayoutProperty('cafe', 'visibility', value);
+    map.current.setLayoutProperty('landmarks', 'visibility', value);
+  };
+
+  const restAll = () => {
+    resetVisible('visible');
+    resetFilter('cafe');
+    resetFilter('landmarks');
+    resetFilter('live');
+  };
+
+  const filterByType = value => {
+    if (value === 'all') {
+      restAll();
+      return;
+    }
+    if (value !== 'live' && value !== 'cafe') {
+      resetVisible('none');
+      map.current.setLayoutProperty('landmarks', 'visibility', 'visible');
+      onFilter('landmarks', 'Theme', value);
+    } else {
+      resetVisible('none');
+      map.current.setLayoutProperty(value, 'visibility', 'visible');
+    }
+  };
+
+  const resetFilter = layerId => {
+    map.current.setFilter(layerId, null);
   };
 
   const filterBySeatingType = value => {
-    onFilter('cafes', 'Seating type', value);
+    if (value === 'all') {
+      resetVisible('visible');
+      resetFilter('cafe');
+      resetFilter('landmarks');
+      resetFilter('live');
+    } else {
+      resetVisible('none');
+      map.current.setLayoutProperty('cafe', 'visibility', 'visible');
+      onFilter('cafe', 'Seating type', value);
+    }
   };
 
   return (
@@ -156,26 +249,21 @@ function App() {
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
       </div>
       <div ref={mapContainer} className="map-container" />
-      <button onClick={onFilter}>filter</button>
-      {/* live表 */}
-      <button onClick={onFilter}>live music venue</button>
-      {/* lands表 */}
-      {/* Place of assembly、Leisure/recreation、Community Use */}
-      <button onClick={onFilter}>lands</button>
-      {/* cafe表 */}
-      <button onClick={onFilter}>cafe</button>
-      {/* cafe表 */}
-      <button onClick={onFilter}>seating type</button>
       <button onClick={measure}>measure</button>
-      <Select defaultValue="" style={{ width: 120 }} onChange={filterByTheme}>
-        <Option value="Transport">Transport</Option>
-        <Option value="Mixed Use">Mixed Use</Option>
+      <Select defaultValue="all" style={{ width: 120 }} onChange={filterByType}>
+        <Option value="all">All</Option>
+        <Option value="Community Use">Community Use</Option>
+        <Option value="Leisure/Recreation">Leisure/Recreation</Option>
         <Option value="Place Of Assembly">Place Of Assembly</Option>
+        <Option value="live">live music venue</Option>
+        <Option value="cafe">Cafes and restaurants</Option>
       </Select>
-      <Select defaultValue="" style={{ width: 120 }} onChange={filterBySeatingType}>
-        <Option value="Seats - Indoor">Seats - Indoor</Option>
-        <Option value="Seats - Outdoor">Seats - Outdoor</Option>
+      <Select defaultValue="all" style={{ width: 120 }} onChange={filterBySeatingType}>
+        <Option value="all">All</Option>
+        <Option value="Seats - Indoor">Indoor</Option>
+        <Option value="Seats - Outdoor">Outdoor</Option>
       </Select>
+      {type && <Detail type={type} detail={detail} />}
     </div>
   );
 }
