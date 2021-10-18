@@ -1,10 +1,12 @@
 import React, { useRef, useEffect, useState } from 'react';
-import mapboxgl, { GeolocateControl } from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
+import mapboxgl, { GeolocateControl, ScaleControl } from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import { ZoomControl } from 'mapbox-gl-controls';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { Select } from 'antd';
 import Detail from './components/Detail';
 import logo from './assets/images/logo.jpg';
+import Modal from 'antd/lib/modal/Modal';
 
 mapboxgl.accessToken =
   'pk.eyJ1IjoiYWxhbndhbmczIiwiYSI6ImNrdXV4dDd0ZjFraG8ydXBqZ2J1OWRwcHUifQ.5NvSu2AbiWynx-7B8TSZQw';
@@ -56,25 +58,32 @@ function App() {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const mapSearch = useRef(null);
+  const popup = useRef(null);
   const [lng, setLng] = useState(144.9594);
   const [lat, setLat] = useState(-37.8019);
   const [zoom, setZoom] = useState(13.5);
   const [type, setType] = useState('');
   const [detail, setDetail] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const [showDoorType, setShowDoorType] = useState(false);
 
   useEffect(() => {
     if (map.current) return; // initialize map only once
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/alanwang3/ckuv1ryyabym517mlgsks0n51',
+      style: 'mapbox://styles/alanwang3/ckuw5091s6l8d17tfwcbxx3f3',
       center: [lng, lat],
       zoom: zoom
     });
+
+    console.log(mapboxgl);
 
     mapSearch.current = new MapboxGeocoder({
       accessToken: mapboxgl.accessToken,
       mapboxgl: mapboxgl
     });
+
+    popup.current = new mapboxgl.Popup();
 
     map.current.addControl(mapSearch.current);
 
@@ -84,6 +93,15 @@ function App() {
         mapboxgl: mapboxgl
       })
     );
+
+    map.current.addControl(
+      new ScaleControl({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl
+      })
+    );
+
+    map.current.addControl(new ZoomControl(), 'top-right');
   });
 
   // style effect
@@ -93,7 +111,7 @@ function App() {
 
     mapInstance.on('mouseenter', 'live', e => {
       mapInstance.getCanvas().style.cursor = 'pointer';
-      new mapboxgl.Popup()
+      popup.current
         .setLngLat(e.lngLat)
         .setHTML(
           '<span class="popup-address">' +
@@ -106,7 +124,7 @@ function App() {
     });
     mapInstance.on('mouseenter', 'landmarks', e => {
       mapInstance.getCanvas().style.cursor = 'pointer';
-      new mapboxgl.Popup()
+      popup.current
         .setLngLat(e.lngLat)
         .setHTML(
           '<span class="popup-address">' +
@@ -119,7 +137,7 @@ function App() {
     });
     mapInstance.on('mouseenter', 'cafe', e => {
       mapInstance.getCanvas().style.cursor = 'pointer';
-      new mapboxgl.Popup()
+      popup.current
         .setLngLat(e.lngLat)
         .setHTML(
           '<span class="popup-address">' +
@@ -144,14 +162,17 @@ function App() {
 
     map.current.on('click', 'live', e => {
       setType('live');
+      setShowModal(true);
       setDetail(e.features[0].properties);
     });
     map.current.on('click', 'landmarks', e => {
       setType('landmarks');
+      setShowModal(true);
       setDetail(e.features[0].properties);
     });
     map.current.on('click', 'cafe', e => {
       setType('cafe');
+      setShowModal(true);
       setDetail(e.features[0].properties);
     });
 
@@ -175,7 +196,7 @@ function App() {
 
   const measure = point => {
     restAll();
-    map.current.addSource('polygon', createGeoJSONCircle(point, 3));
+    map.current.addSource('polygon', createGeoJSONCircle(point, 0.8));
 
     map.current.addLayer({
       id: 'polygon',
@@ -212,6 +233,11 @@ function App() {
       map.current.setLayoutProperty('landmarks', 'visibility', 'visible');
       onFilter('landmarks', 'Theme', value);
     } else {
+      if (value === 'cafe') {
+        setShowDoorType(true);
+      } else {
+        setShowDoorType(false);
+      }
       resetVisible('none');
       map.current.setLayoutProperty(value, 'visibility', 'visible');
     }
@@ -221,12 +247,13 @@ function App() {
     map.current.setFilter(layerId, null);
   };
 
+  const scrollToMap = layerId => {
+    document.getElementById('map-wrapper').scrollIntoView({ block: 'start', behavior: 'smooth' });
+  };
+
   const filterBySeatingType = value => {
     if (value === 'all') {
-      resetVisible('visible');
       resetFilter('cafe');
-      resetFilter('landmarks');
-      resetFilter('live');
     } else {
       resetVisible('none');
       map.current.setLayoutProperty('cafe', 'visibility', 'visible');
@@ -234,35 +261,68 @@ function App() {
     }
   };
 
+  const handleCancel = () => {
+    setShowModal(false);
+  };
+
   return (
     <div>
-      <div className="title-wrap">
-        <img src={logo} />
-        <h1>TravelExploring</h1>
-      </div>
-
-      <div className="map-wrapper">
-        <div className="sidebar">
-          Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
+      <div className="cover">
+        <div className="overlay"></div>
+        <div className="title">
+          <h1>Enjoy Your Trip in Melbourne</h1>
+          <div className="button" onClick={scrollToMap}>
+            Start
+          </div>
         </div>
-        <div ref={mapContainer} className="map-container" />
       </div>
 
-      <div className="content-wrap">
-        <Select defaultValue="all" style={{ width: 200, marginRight: 20 }} onChange={filterByType}>
-          <Option value="all">All</Option>
-          <Option value="Community Use">Community Use</Option>
-          <Option value="Leisure/Recreation">Leisure/Recreation</Option>
-          <Option value="Place Of Assembly">Place Of Assembly</Option>
-          <Option value="live">live music venue</Option>
-          <Option value="cafe">Cafes and restaurants</Option>
-        </Select>
-        <Select defaultValue="all" style={{ width: 200 }} onChange={filterBySeatingType}>
-          <Option value="all">All</Option>
-          <Option value="Seats - Indoor">Indoor</Option>
-          <Option value="Seats - Outdoor">Outdoor</Option>
-        </Select>
-        <div style={{ marginTop: 10 }}>{type && <Detail type={type} detail={detail} />}</div>
+      <div style={{ height: '100vh' }}>
+        <div className="title-wrap">
+          <img src={logo} />
+          <h2>TravelExploring</h2>
+        </div>
+
+        <div id="map-wrapper" className="map-wrapper">
+          {/* <div className="sidebar">
+            Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
+          </div> */}
+
+          <div className="sidebar">
+            <Select
+              defaultValue="all"
+              style={{ width: 200, marginRight: 20 }}
+              onChange={filterByType}
+            >
+              <Option value="all">All</Option>
+              <Option value="Community Use">Community Use</Option>
+              <Option value="Leisure/Recreation">Leisure/Recreation</Option>
+              <Option value="Place Of Assembly">Place Of Assembly</Option>
+              <Option value="live">live music venue</Option>
+              <Option value="cafe">Cafes and restaurants</Option>
+            </Select>
+
+            {showDoorType && (
+              <Select defaultValue="all" style={{ width: 200 }} onChange={filterBySeatingType}>
+                <Option value="all">All</Option>
+                <Option value="Seats - Indoor">Indoor</Option>
+                <Option value="Seats - Outdoor">Outdoor</Option>
+              </Select>
+            )}
+          </div>
+
+          <div ref={mapContainer} className="map-container" />
+        </div>
+
+        <div className="content-wrap">
+          <div style={{ marginTop: 10 }}>
+            {type && (
+              <Modal footer={null} title="Info" visible={showModal} onCancel={handleCancel}>
+                <Detail type={type} detail={detail} />
+              </Modal>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

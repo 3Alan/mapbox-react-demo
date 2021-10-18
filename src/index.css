@@ -10,8 +10,55 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+.cover {
+  height: 100vh;
+  background: url('./assets/images/cover.jpg') no-repeat center center;
+  background-size: cover;
+  position: relative;
+}
+
+div.overlay {
+  opacity: 0.3;
+  background-color: black;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.title {
+  position: absolute;
+  text-align: center;
+  min-width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  left: 50%;
+  bottom: 30px;
+  transform: translate(-50%, -50%);
+}
+
+.title h1 {
+  color: #fff;
+  font-size: 52px;
+  font-weight: bold;
+}
+
+.button {
+  margin-top: 60px;
+  padding: 12px;
+  border: 2px solid #fff;
+  width: 210px;
+  border-radius: 50px;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+}
+
 .map-wrapper {
   position: relative;
+  padding: 0 20px;
 }
 
 .title-wrap {
@@ -30,16 +77,16 @@ code {
 }
 
 .sidebar {
-  background-color: rgba(35, 55, 75, 0.9);
+  /* background-color: rgba(35, 55, 75, 0.9);
   color: #fff;
   padding: 6px 12px;
-  font-family: monospace;
+  font-family: monospace; */
   z-index: 1;
   position: absolute;
   top: 0;
-  left: 0;
+  left: 15px;
   margin: 12px;
-  border-radius: 4px;
+  /* border-radius: 4px; */
 }
 
 .content-wrap {
