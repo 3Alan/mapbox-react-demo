@@ -86,8 +86,11 @@ export default function Table() {
     const divElement = wrapper.current;
     const vizElement = obj.current;
     if (divElement.offsetWidth > 800) {
-      vizElement.style.width = '1000px';
-      vizElement.style.height = '827px';
+      vizElement.style.width = '100%';
+      vizElement.style.height = divElement.offsetWidth * 0.75 + 'px';
+    } else if (divElement.offsetWidth > 500) {
+      vizElement.style.width = '100%';
+      vizElement.style.height = divElement.offsetWidth * 0.75 + 'px';
     } else {
       vizElement.style.width = '100%';
       vizElement.style.height = '727px';
@@ -112,25 +115,27 @@ export default function Table() {
         <div
           ref={wrapper}
           className="tableauPlaceholder"
-          id="viz1634545700983"
+          id="viz1634552274098"
           style={{ position: 'relative' }}
         >
           <noscript>
-            <a href="#">
+            <a href=" ">
               <img
                 alt="仪表板 1 "
-                src="https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;3D&#47;3DNYKK35P&#47;1_rss.png"
-                style="border: none"
+                src="https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;pu&#47;publictoiletInfo2&#47;1_1&#47;1_rss.png"
+                style={{ border: 'none' }}
               />
             </a>
           </noscript>
-          <object ref={obj} className="tableauViz" style={{ display: 'none' }}>
-            <param name="host_url" value="https%3A%2F%2Fpublic.tableau.com%2F" />{' '}
-            <param name="embed_code_version" value="3" />{' '}
-            <param name="path" value="shared&#47;3DNYKK35P" /> <param name="toolbar" value="yes" />
+          <object ref={obj} className="tableauViz" style={{ border: 'none' }}>
+            <param name="host_url" value="https%3A%2F%2Fpublic.tableau.com%2F" />
+            <param name="embed_code_version" value="3" /> <param name="site_root" value="" />
+            <param name="name" value="publictoiletInfo2&#47;1_1" />
+            <param name="tabs" value="no" />
+            <param name="toolbar" value="yes" />
             <param
               name="static_image"
-              value="https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;3D&#47;3DNYKK35P&#47;1.png"
+              value="https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;pu&#47;publictoiletInfo2&#47;1_1&#47;1.png"
             />
             <param name="animate_transition" value="yes" />
             <param name="display_static_image" value="yes" />
