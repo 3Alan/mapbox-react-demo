@@ -58,7 +58,7 @@ div.overlay {
 
 .map-wrapper {
   position: relative;
-  padding: 0 20px;
+  padding: 0 40px;
 }
 
 .title-wrap {
@@ -77,16 +77,11 @@ div.overlay {
 }
 
 .sidebar {
-  /* background-color: rgba(35, 55, 75, 0.9);
-  color: #fff;
-  padding: 6px 12px;
-  font-family: monospace; */
   z-index: 1;
   position: absolute;
   top: 0;
-  left: 15px;
-  margin: 12px;
-  /* border-radius: 4px; */
+  left: 10px;
+  top: 10px;
 }
 
 .content-wrap {
