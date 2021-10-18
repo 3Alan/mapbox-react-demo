@@ -196,13 +196,16 @@ function App() {
 
   const measure = point => {
     restAll();
+    const hasSource = map.current.getSource('polygon');
+    const hasLayer = map.current.getLayer('polygon');
+    hasLayer && map.current.removeLayer('polygon');
+    hasSource && map.current.removeSource('polygon');
     map.current.addSource('polygon', createGeoJSONCircle(point, 0.8));
 
     map.current.addLayer({
       id: 'polygon',
       type: 'fill',
       source: 'polygon',
-      layout: {},
       paint: {
         'fill-color': '#93C5FD',
         'fill-opacity': 0.4
