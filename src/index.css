@@ -87,3 +87,22 @@ div.overlay {
 .content-wrap {
   padding: 10px;
 }
+
+.popup-address {
+  color: #1d4ed8;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 10px;
+  right: 20px;
+  z-index: 99;
+}
+
+.wrapper-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

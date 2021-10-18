@@ -3,11 +3,12 @@ import mapboxgl, { GeolocateControl, ScaleControl } from '!mapbox-gl'; // eslint
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import { ZoomControl } from 'mapbox-gl-controls';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
-import { Button, Select } from 'antd';
+import { Affix, Button, Select } from 'antd';
 import Detail from '../components/Detail';
 import logo from '../assets/images/logo.jpg';
 import Modal from 'antd/lib/modal/Modal';
 import { Link } from 'react-router-dom';
+import Table from '../components/Table';
 
 mapboxgl.accessToken =
   'pk.eyJ1IjoiYWxhbndhbmczIiwiYSI6ImNrdXV4dDd0ZjFraG8ydXBqZ2J1OWRwcHUifQ.5NvSu2AbiWynx-7B8TSZQw';
@@ -119,10 +120,10 @@ export default function Map(props) {
       popup.current
         .setLngLat(e.lngLat)
         .setHTML(
-          '<span class="popup-address">' +
+          '<strong class="popup-address">' +
             'Name: ' +
             e.features[0].properties['venue_name'] +
-            '</span><br>' +
+            '</strong><br>' +
             ' Type: places of interests'
         )
         .addTo(mapInstance);
@@ -132,10 +133,10 @@ export default function Map(props) {
       popup.current
         .setLngLat(e.lngLat)
         .setHTML(
-          '<span class="popup-address">' +
+          '<strong class="popup-address">' +
             'Name: ' +
             e.features[0].properties['Feature Name'] +
-            '</span><br>' +
+            '</strong><br>' +
             ' Type: places of interests'
         )
         .addTo(mapInstance);
@@ -145,10 +146,10 @@ export default function Map(props) {
       popup.current
         .setLngLat(e.lngLat)
         .setHTML(
-          '<span class="popup-address">' +
+          '<strong class="popup-address">' +
             'Name: ' +
             e.features[0].properties['Trading name'] +
-            '</span><br>' +
+            '</strong><br>' +
             ' Type: café and restaurant'
         )
         .addTo(mapInstance);
@@ -268,58 +269,71 @@ export default function Map(props) {
   const handleCancel = () => {
     setShowModal(false);
   };
-  return (
-    <div style={{ height: '100vh' }}>
-      <div className="title-wrap">
-        <img src={logo} />
-        <h2>TravelExploring</h2>
-      </div>
 
-      <div id="map-wrapper" className="map-wrapper">
-        {/* <div className="sidebar">
+  const scrollToView = page => {
+    document.getElementById(`page-${page}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  return (
+    <>
+      <div className="menu">
+        <Button onClick={() => scrollToView(1)}>Map</Button>
+        <Button onClick={() => scrollToView(2)}>Toilet</Button>
+        <Button onClick={() => scrollToView(3)}>Weather</Button>
+      </div>
+      <div id="page-1" style={{ height: '100vh' }}>
+        <div className="title-wrap">
+          <img src={logo} />
+          <h2>TravelExploring</h2>
+        </div>
+
+        <div id="map-wrapper" className="map-wrapper">
+          {/* <div className="sidebar">
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
       </div> */}
 
-        <div style={{ position: 'relative' }}>
-          <div className="sidebar">
-            <Select
-              defaultValue="all"
-              style={{ width: 200, marginRight: 20 }}
-              onChange={filterByType}
-            >
-              <Option value="all">All</Option>
-              <Option value="Community Use">Community Use</Option>
-              <Option value="Leisure/Recreation">Leisure/Recreation</Option>
-              <Option value="Place Of Assembly">Place Of Assembly</Option>
-              <Option value="live">live music venue</Option>
-              <Option value="cafe">Cafes and restaurants</Option>
-            </Select>
-
-            {showDoorType && (
-              <Select defaultValue="all" style={{ width: 200 }} onChange={filterBySeatingType}>
+          <div style={{ position: 'relative' }}>
+            <div className="sidebar">
+              <Select
+                defaultValue="all"
+                style={{ width: 200, marginRight: 20 }}
+                onChange={filterByType}
+              >
                 <Option value="all">All</Option>
-                <Option value="Seats - Indoor">Indoor</Option>
-                <Option value="Seats - Outdoor">Outdoor</Option>
+                <Option value="Community Use">Community Use</Option>
+                <Option value="Leisure/Recreation">Leisure/Recreation</Option>
+                <Option value="Place Of Assembly">Place Of Assembly</Option>
+                <Option value="live">live music venue</Option>
+                <Option value="cafe">Cafes and restaurants</Option>
               </Select>
+
+              {showDoorType && (
+                <Select defaultValue="all" style={{ width: 200 }} onChange={filterBySeatingType}>
+                  <Option value="all">All</Option>
+                  <Option value="Seats - Indoor">Indoor</Option>
+                  <Option value="Seats - Outdoor">Outdoor</Option>
+                </Select>
+              )}
+            </div>
+          </div>
+
+          <div ref={mapContainer} className="map-container" />
+          <Button style={{ marginTop: 20 }}>
+            <Link to="/">Back</Link>
+          </Button>
+        </div>
+
+        <div className="content-wrap">
+          <div style={{ marginTop: 10 }}>
+            {type && (
+              <Modal footer={null} title="Info" visible={showModal} onCancel={handleCancel}>
+                <Detail type={type} detail={detail} />
+              </Modal>
             )}
           </div>
         </div>
-
-        <div ref={mapContainer} className="map-container" />
-        <Button style={{ marginTop: 20 }}>
-          <Link to="/">Back</Link>
-        </Button>
       </div>
 
-      <div className="content-wrap">
-        <div style={{ marginTop: 10 }}>
-          {type && (
-            <Modal footer={null} title="Info" visible={showModal} onCancel={handleCancel}>
-              <Detail type={type} detail={detail} />
-            </Modal>
-          )}
-        </div>
-      </div>
-    </div>
+      <Table />
+    </>
   );
 }

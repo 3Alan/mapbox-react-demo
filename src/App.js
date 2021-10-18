@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Map from './pages/Map';
+import Table from './components/Table';
 
 function App() {
   return (

@@ -4,31 +4,48 @@ function Cafe(props) {
   const { detail } = props;
   return (
     <Card style={{ width: '100%' }}>
-      <p>Trading name: {detail['Trading name']}</p>
-      <p>Street address: {detail['Street address']}</p>
-      <p>Industry (ANZSIC4) description: {detail['Industry (ANZSIC4) description']}</p>
-      <p>Seating type: {detail['Seating type']}</p>
-      <p>Number of seats: {detail['Number of seats']}</p>
+      <p style={{ color: '#1d4ed8' }}>{detail['Trading name']}</p>
+      <p>
+        <strong>Street address:</strong> {detail['Street address']}
+      </p>
+      <p>
+        <strong>Industry (ANZSIC4) description:</strong> {detail['Industry (ANZSIC4) description']}
+      </p>
+      <p>
+        <strong>Seating type: </strong>
+        {detail['Seating type']}
+      </p>
+      <p>
+        <strong>Number of seats:</strong> {detail['Number of seats']}
+      </p>
     </Card>
   );
 }
 function Landmarks({ detail }) {
   return (
     <Card style={{ width: '100%' }}>
-      <p>Theme: {detail['Theme']}</p>
-      <p>Sub Theme: {detail['Sub Theme']}</p>
-      <p>Feature Name: {detail['Feature Name']}</p>
+      <p style={{ color: '#1d4ed8' }}>{detail['Theme']}</p>
+      <p>
+        <strong>Sub Theme:</strong> {detail['Sub Theme']}
+      </p>
+      <p>
+        <strong>Feature Name:</strong> {detail['Feature Name']}
+      </p>
     </Card>
   );
 }
 function Live({ detail }) {
   return (
     <Card style={{ width: '100%' }}>
-      <p>Venue name: {detail['venue_name']}</p>
-      <p>Venue address: {detail['venue_address']}</p>
-      <p>Space type: {detail['space_type']}</p>
+      <p style={{ color: '#1d4ed8' }}>{detail['venue_name']}</p>
       <p>
-        Website:{' '}
+        <strong>Venue address:</strong> {detail['venue_address']}
+      </p>
+      <p>
+        <strong>Space type:</strong> {detail['space_type']}
+      </p>
+      <p>
+        <strong>Website:</strong>
         <a target="_blank" href={detail['website']}>
           {detail['website']}
         </a>
