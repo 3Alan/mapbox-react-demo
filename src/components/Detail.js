@@ -4,7 +4,9 @@ function Cafe(props) {
   const { detail } = props;
   return (
     <Card style={{ width: '100%' }}>
-      <p style={{ color: '#1d4ed8' }}>{detail['Trading name']}</p>
+      <p style={{ color: '#1d4ed8' }}>
+        <strong>{detail['Trading name']}</strong>
+      </p>
       <p>
         <strong>Street address:</strong> {detail['Street address']}
       </p>
@@ -24,7 +26,9 @@ function Cafe(props) {
 function Landmarks({ detail }) {
   return (
     <Card style={{ width: '100%' }}>
-      <p style={{ color: '#1d4ed8' }}>{detail['Theme']}</p>
+      <p style={{ color: '#1d4ed8' }}>
+        <strong>{detail['Theme']}</strong>
+      </p>
       <p>
         <strong>Sub Theme:</strong> {detail['Sub Theme']}
       </p>
@@ -37,7 +41,9 @@ function Landmarks({ detail }) {
 function Live({ detail }) {
   return (
     <Card style={{ width: '100%' }}>
-      <p style={{ color: '#1d4ed8' }}>{detail['venue_name']}</p>
+      <p style={{ color: '#1d4ed8' }}>
+        <strong>{detail['venue_name']}</strong>
+      </p>
       <p>
         <strong>Venue address:</strong> {detail['venue_address']}
       </p>

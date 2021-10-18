@@ -99,6 +99,10 @@ export default function Table() {
 
   return (
     <>
+      <div id="page-3" className="wrapper-center" style={{ height: '100vh' }}>
+        <ReactEcharts style={{ width: '90%' }} option={option} />
+      </div>
+
       <div
         style={{
           height: '100vh'
@@ -137,10 +141,6 @@ export default function Table() {
             <param name="filter" value="publish=yes" />
           </object>
         </div>
-      </div>
-
-      <div id="page-3" className="wrapper-center" style={{ height: '100vh' }}>
-        <ReactEcharts style={{ width: '90%' }} option={option} />
       </div>
     </>
   );

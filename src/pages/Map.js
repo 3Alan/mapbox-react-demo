@@ -277,8 +277,8 @@ export default function Map(props) {
     <>
       <div className="menu">
         <Button onClick={() => scrollToView(1)}>Map</Button>
-        <Button onClick={() => scrollToView(2)}>Toilet</Button>
         <Button onClick={() => scrollToView(3)}>Weather</Button>
+        <Button onClick={() => scrollToView(2)}>Toilet</Button>
       </div>
       <div id="page-1" style={{ height: '100vh' }}>
         <div className="title-wrap">
