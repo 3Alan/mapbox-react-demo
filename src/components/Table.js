@@ -104,7 +104,6 @@ export default function Table() {
           height: '100vh'
         }}
         id="page-2"
-        className="wrapper-center"
       >
         <div
           ref={wrapper}
