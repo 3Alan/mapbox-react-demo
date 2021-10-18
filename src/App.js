@@ -4,6 +4,7 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
 import { Select } from 'antd';
 import Detail from './components/Detail';
+import logo from './assets/images/logo.jpg';
 
 mapboxgl.accessToken =
   'pk.eyJ1IjoiYWxhbndhbmczIiwiYSI6ImNrdXV4dDd0ZjFraG8ydXBqZ2J1OWRwcHUifQ.5NvSu2AbiWynx-7B8TSZQw';
@@ -235,24 +236,34 @@ function App() {
 
   return (
     <div>
-      <div className="sidebar">
-        Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
+      <div className="title-wrap">
+        <img src={logo} />
+        <h1>TravelExploring</h1>
       </div>
-      <div ref={mapContainer} className="map-container" />
-      <Select defaultValue="all" style={{ width: 120 }} onChange={filterByType}>
-        <Option value="all">All</Option>
-        <Option value="Community Use">Community Use</Option>
-        <Option value="Leisure/Recreation">Leisure/Recreation</Option>
-        <Option value="Place Of Assembly">Place Of Assembly</Option>
-        <Option value="live">live music venue</Option>
-        <Option value="cafe">Cafes and restaurants</Option>
-      </Select>
-      <Select defaultValue="all" style={{ width: 120 }} onChange={filterBySeatingType}>
-        <Option value="all">All</Option>
-        <Option value="Seats - Indoor">Indoor</Option>
-        <Option value="Seats - Outdoor">Outdoor</Option>
-      </Select>
-      {type && <Detail type={type} detail={detail} />}
+
+      <div className="map-wrapper">
+        <div className="sidebar">
+          Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
+        </div>
+        <div ref={mapContainer} className="map-container" />
+      </div>
+
+      <div className="content-wrap">
+        <Select defaultValue="all" style={{ width: 200, marginRight: 20 }} onChange={filterByType}>
+          <Option value="all">All</Option>
+          <Option value="Community Use">Community Use</Option>
+          <Option value="Leisure/Recreation">Leisure/Recreation</Option>
+          <Option value="Place Of Assembly">Place Of Assembly</Option>
+          <Option value="live">live music venue</Option>
+          <Option value="cafe">Cafes and restaurants</Option>
+        </Select>
+        <Select defaultValue="all" style={{ width: 200 }} onChange={filterBySeatingType}>
+          <Option value="all">All</Option>
+          <Option value="Seats - Indoor">Indoor</Option>
+          <Option value="Seats - Outdoor">Outdoor</Option>
+        </Select>
+        <div style={{ marginTop: 10 }}>{type && <Detail type={type} detail={detail} />}</div>
+      </div>
     </div>
   );
 }

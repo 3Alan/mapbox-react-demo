@@ -10,6 +10,21 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
+.map-wrapper {
+  position: relative;
+}
+
+.title-wrap {
+  display: flex;
+  align-items: flex-end;
+  padding: 10px;
+}
+
+.title-wrap img {
+  width: 100px;
+  margin-right: 10px;
+}
+
 .map-container {
   height: 60vh;
 }
@@ -25,4 +40,8 @@ code {
   left: 0;
   margin: 12px;
   border-radius: 4px;
+}
+
+.content-wrap {
+  padding: 10px;
 }
