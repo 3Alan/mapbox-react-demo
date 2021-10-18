@@ -106,3 +106,9 @@ div.overlay {
   justify-content: center;
   align-items: center;
 }
+
+.echarts-bg {
+  background: url('./assets/images/bg.jpg') no-repeat center center;
+  background-size: cover;
+  position: relative;
+}

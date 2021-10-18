@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
 import ReactEcharts from 'echarts-for-react';
+import Header from './Header';
 
 const option = {
+  backgroundColor: 'white',
   title: {
     text: 'Temperature Change in Melbourne'
   },
@@ -102,8 +104,11 @@ export default function Table() {
 
   return (
     <>
-      <div id="page-3" className="wrapper-center" style={{ height: '100vh' }}>
-        <ReactEcharts style={{ width: '90%' }} option={option} />
+      <div id="page-3" className="echarts-bg" style={{ height: '100vh' }}>
+        <Header />
+        <div className="wrapper-center">
+          <ReactEcharts style={{ width: '80%', marginTop: '15vh' }} option={option} />
+        </div>
       </div>
 
       <div
@@ -112,6 +117,7 @@ export default function Table() {
         }}
         id="page-2"
       >
+        <Header />
         <div
           ref={wrapper}
           className="tableauPlaceholder"

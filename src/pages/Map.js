@@ -3,12 +3,12 @@ import mapboxgl, { GeolocateControl, ScaleControl } from '!mapbox-gl'; // eslint
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import { ZoomControl } from 'mapbox-gl-controls';
 import '@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css';
-import { Affix, Button, Select } from 'antd';
+import { Button, Select } from 'antd';
 import Detail from '../components/Detail';
-import logo from '../assets/images/logo.jpg';
 import Modal from 'antd/lib/modal/Modal';
 import { Link } from 'react-router-dom';
 import Table from '../components/Table';
+import Header from '../components/Header';
 
 mapboxgl.accessToken =
   'pk.eyJ1IjoiYWxhbndhbmczIiwiYSI6ImNrdXV4dDd0ZjFraG8ydXBqZ2J1OWRwcHUifQ.5NvSu2AbiWynx-7B8TSZQw';
@@ -281,11 +281,7 @@ export default function Map(props) {
         <Button onClick={() => scrollToView(2)}>Toilet</Button>
       </div>
       <div id="page-1" style={{ height: '100vh' }}>
-        <div className="title-wrap">
-          <img src={logo} />
-          <h2>TravelExploring</h2>
-        </div>
-
+        <Header />
         <div id="map-wrapper" className="map-wrapper">
           {/* <div className="sidebar">
         Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
